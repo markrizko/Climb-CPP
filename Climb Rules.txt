@@ -1,0 +1,35 @@
+PHYSICAL CARD GAME RULES:
+
+Climb - A single player card game by Mark Rizko. 
+Split the deck between the two colors.
+Denote one deck as the enemy and as the friendly.
+From the friendly deck, draw 3 cards in your hand.
+From the enemy deck, flip 3 cards onto the table, and remove one king and put it outside the playing area, this will be your last enemy. 
+
+With the 3 cards in your hand, try and mathematically beat the opponents deck by playing cards in the right order, seeking card advantage, and knowing math.
+The player can attack as many cards as they like with as many cards as they would like to as well, for example, I can attack a 6 and a 2 with a single 10 and therefore
+gain card advantage. 
+
+I can also draw a tie, to which you draw from the deck the top cards and if the friendly wins discard all cards in the dispute, if the enemy wins his top card stays but
+the challenged card is discarded. 
+
+Friendly Ace wipes enemy cards in play, enemy Ace counts for 11. Royalty all count for 10, but a King has seniority over a queen and a jack. And a queen has seniority over a jack. A jack has seniority over a 10. 
+
+
+Score Rule:
+End of game, count up all remaining (including cards played on last turn) and +5 for King victory.
+
+
+TO PLAY C++ Version:
+Under "Select Red:" simply input 1, 2, and/or 3 to choose card(s) in specified positions. When finished picking, add a . and press enter. 
+
+EX:
+
+if red cards in play are 
+
+	2	4	6
+Select Red: "12. [Enter]" registers the 2 and 4 to be played.
+Do the same for the black. 
+
+Objective of the game is to 'climb' to the end of the enemy deck, seeking card advantage and smart mathematical plays and face the enemy king at the end 
+with remaining cards. 
