@@ -58,9 +58,9 @@ Deck::Deck(){
     cardsLeft = 0;
 }
 
-void Deck::FillDeck(){
+void Deck::FillRed(){
     int i; 
-    for (i = 1; i < 14; i++){
+    for (i = 1; i < 14; ++i){
         Card *in = new Card(i);
         cDeck.push_back(*in);
         cDeck.push_back(*in);
@@ -69,9 +69,27 @@ void Deck::FillDeck(){
     ShuffleDeck();
 }
 
+// had to separate fill deck functions because black deck plays king at very end
+void Deck::FillBlack(){
+    int i;
+    for (i = 1; i < 14; ++i){
+        Card *in = new Card(i);
+        cDeck.push_back(*in);
+        if (i != 13){
+            cDeck.push_back(*in);
+        }
+    }
+    cardsLeft = 25;
+    ShuffleDeck();
+}
+
 Deck::Deck(const Deck& source) {
 	cDeck = source.cDeck;
 	cardsLeft = source.cardsLeft;
+}
+
+void Deck::clearDeck(){
+    cardsLeft = 0;
 }
 
 void Deck::ShuffleDeck(){
@@ -193,4 +211,5 @@ void Deck::push_front(const Card& c) { // push card to front of deck for tie
     auto it = cDeck.begin();
     cDeck.insert(it,c);
 }
+
 

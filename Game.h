@@ -23,6 +23,7 @@ public:
 	int checkWin();
 	void displayCards();
 	bool blackWin(); // checks for invalid moves if deck is 0
+	bool finalEncounter(); // face another king at the end of the game with your remaining cards
 private:
 	int redTotal();
 	int blackTotal();

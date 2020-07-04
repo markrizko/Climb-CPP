@@ -1,11 +1,13 @@
 #include "Game.h"
-// TODO fix endgame
+// TODO fix endgame -- KEEP CHECKING IF FIXED
+// TODO implement score mechanic (caluclate cards left at the end of run, +5 for king victory)
+// TODO create rules README
 Game::Game(){
 redDeck = new Deck();
 blackDeck = new Deck();
 
-redDeck->FillDeck();
-blackDeck->FillDeck();
+redDeck->FillRed();
+blackDeck->FillBlack();
 
 //fill playspace
 Draw();
@@ -16,9 +18,30 @@ initFlag = true;
 gameOver = false;
 }
 
+bool Game::finalEncounter() {
+    Card King(13);
+    std::cout << "\n\n\t\tTime to face the King\t\t\n\n";
+    blackInPlay[1] = King;
+    Draw();
+    displayCards();
+    select();
+    if (compare() == 4 || compare() == 6 || compare() == 1){
+        if (compare() == 6){
+            std::cout << "\nKing Victory\t\t+5 Points\n";
+        }
+        return true;
+    }
+    return false;
+}
+
 void Game::endGame(){
     if (winner){
-        std::cout << "You win!" << std::endl;
+        if (finalEncounter()){
+            std::cout << "You win!" << std::endl;
+        }
+        else{
+            std::cout << "You lose!" << std::endl;
+        }
     }
     else{
         std::cout << "You lose!" << std::endl;
@@ -38,7 +61,7 @@ bool Game::blackWin(){
             break;
         }
         bsum += blackInPlay[i].getValue();
-        btag+= blackInPlay[i].getTag();
+        btag += blackInPlay[i].getTag();
         rsum += redInPlay[i].getValue();
         rtag += redInPlay[i].getTag();
     }
@@ -83,7 +106,7 @@ int Game::checkWin() {
 
 void Game::runGame(){
     while (!gameOver){
-        ValidMove = false;
+        ValidMove = false; // invalid until proven valid
         while(!ValidMove){
             displayCards();
             Turn();
@@ -94,20 +117,28 @@ void Game::runGame(){
 }
 
 void Game::Draw(){
-        for (int i = 0; i < 3; i++){
-            if (redInPlay[i] == NULL){
-				redInPlay[i] = redDeck->getCard();
-			}        }
-        for (int j = 0; j < 3; j++){
-			if (blackInPlay[j] == NULL){
-				blackInPlay[j] = blackDeck->getCard();
-			}
+        if (redDeck->deckSize() != 0){
+            for (int i = 0; i < 3; i++){
+                if (redInPlay[i] == NULL){
+                    redInPlay[i] = redDeck->getCard();
+                }
+            }
+        }
+        if (blackDeck->deckSize() != 0) {
+            for (int j = 0; j < 3; j++) {
+                if (blackInPlay[j] == NULL) {
+                    blackInPlay[j] = blackDeck->getCard();
+                }
+            }
         }
 }
 
 
 
 int Game::Tie(){ // 0 if tie again, 1 if win, 2 if lose
+    if (blackDeck->deckSize() == 0){
+        return 1;
+    }
     Card red = redDeck->getCard();
     Card black = blackDeck->getCard();
     /*if (black == NULL){
@@ -206,6 +237,7 @@ int Game::blackTotal(){
 
 int Game::compare(){
     if (redInPlay[*selectedRed.begin()].getTag() == 1){
+        std::cout << "ACE WIPE\n";
         return 4; // ace wipe
     }
     else if (redInPlay[*selectedRed.begin()].getTag() == 13 && blackInPlay[*selectedBlack.begin()].getTag() == 13){
@@ -275,6 +307,9 @@ void Game::select(){
             case '.':
                 flag = false;
                 break;
+            case 'x':
+                blackDeck->clearDeck();
+                break;
             default:
                 std::cout << "Invalid\n";
                 break;
@@ -301,6 +336,9 @@ void Game::select(){
             case '.':
                 flag = false;
                 break;
+            case 'x':
+                redDeck->clearDeck();
+                break;
             default:
                 std::cout << "Invalid\n";
                 break;
@@ -310,7 +348,7 @@ void Game::select(){
     return;
 }
 void Game::displayCards() {
-    std::cout<< "\t\t\tK\t\t\tBlack Cards Left: " << blackDeck->deckSize() << std::endl << std::endl;
+    std::cout<< "\t\tK\t\t\tBlack Cards Left: " << blackDeck->deckSize() << std::endl;
     std::cout << "Black: " << std::endl;
     std::cout <<"\t" << blackInPlay[0] << "\t" << blackInPlay[1] << "\t" << blackInPlay[2] << std::endl;
     std::cout << "Red: " << std::endl;

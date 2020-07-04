@@ -42,12 +42,14 @@ class Deck{
         Deck();
 		Deck(const Deck& source); // copy constructor for deck
         void ShuffleDeck();
-        void FillDeck();
+        void FillRed();
+        void FillBlack();
         Card getCard();
         int deckSize();
         void push_front(const Card& c);
         Deck operator=(const Deck& source);
         void cardSwap();
+        void clearDeck(); // clear for debugging
 
     private:
         std::vector<Card> cDeck;
