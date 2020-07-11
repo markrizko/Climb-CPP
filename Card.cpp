@@ -8,7 +8,7 @@ Card::~Card(){
     cardTag = NULL;
 }
 */
-//TODO pull king out of black deck
+
 Card::Card(){
 	cardTag = NULL;
 	value = NULL;
@@ -56,6 +56,16 @@ bool Card::isAce(){
 Deck::Deck(){
 	//cDeck.clear();
     cardsLeft = 0;
+}
+
+int Deck::countDeck(){
+    int i, count = 0;
+    for (i = 0; i < this->deckSize(); ++i){
+        if (cDeck[i].getTag() != 1){ // not counting ace
+            count+= cDeck[i].getValue();
+        }
+    }
+    return count;
 }
 
 void Deck::FillRed(){

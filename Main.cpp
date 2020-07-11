@@ -15,6 +15,7 @@ int main(int argc, char * argv[])
 {
     srand(time(NULL));
 	Game game;
+	game.welcomeScreen();
 	game.runGame();
 
 	return 0;

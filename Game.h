@@ -1,6 +1,7 @@
 #pragma once
 #include <stack>
 #include <iostream>
+#include <fstream>
 #include "Card.h"
 
 class Game
@@ -24,9 +25,14 @@ public:
 	void displayCards();
 	bool blackWin(); // checks for invalid moves if deck is 0
 	bool finalEncounter(); // face another king at the end of the game with your remaining cards
+	void welcomeScreen(); // adds welcome screen to the game
+	void displayRules(); // in-game rules
+
 private:
 	int redTotal();
 	int blackTotal();
+	bool adStats;
+	void displayAdStats();
 	bool gameOver; // true when an end condition is met
 	bool winner;
 	Deck *redDeck;

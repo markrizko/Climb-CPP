@@ -46,6 +46,7 @@ class Deck{
         void FillBlack();
         Card getCard();
         int deckSize();
+        int countDeck();
         void push_front(const Card& c);
         Deck operator=(const Deck& source);
         void cardSwap();

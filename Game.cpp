@@ -1,7 +1,8 @@
 #include "Game.h"
-// TODO fix endgame -- KEEP CHECKING IF FIXED
+// TODO keep testing endgame for bugs
 // TODO implement score mechanic (caluclate cards left at the end of run, +5 for king victory)
-// TODO create rules README
+// TODO add play again feature after game is over
+// TODO add cards in play to advanced stats
 Game::Game(){
 redDeck = new Deck();
 blackDeck = new Deck();
@@ -11,11 +12,87 @@ blackDeck->FillBlack();
 
 //fill playspace
 Draw();
+adStats = false;
 redNumIP = 0;
 blackNumIP = 0;
 ValidMove = false;
 initFlag = true;
 gameOver = false;
+}
+
+void Game::displayAdStats(){
+    std::string csign = "", nsign = ""; // positive or negative signs, blank at default for equal case
+    int ca, na, i;
+    if (redDeck->deckSize() == blackDeck->deckSize()){
+        ca = 0;
+    }
+    else if (redDeck->deckSize() > blackDeck->deckSize()){
+        csign = "+";
+        ca = redDeck->deckSize() - blackDeck->deckSize();
+    }
+    else{
+        csign = "-";
+        ca = blackDeck->deckSize() - redDeck->deckSize();
+    }
+
+    if (redDeck->countDeck() == blackDeck->countDeck()){
+        na = 0;
+    }
+    else if (redDeck->countDeck() > blackDeck->countDeck()){
+        nsign = "+";
+        na = redDeck->countDeck() - blackDeck->countDeck();
+    }
+    else{
+        nsign = "-";
+        na = blackDeck->countDeck() - redDeck->countDeck();
+    }
+
+    std::cout << "Card Advantage: " << csign <<  ca << "\tNumber Advantage: " << nsign << na << std::endl;
+    return;
+}
+
+void Game::displayRules(){
+    std::ifstream rules;
+    rules.open("rules.txt", std::ifstream::in);
+    char c = rules.get();
+    while (rules.good()){
+        std::cout << c;
+        c = rules.get();
+    }
+
+    rules.close();
+    return;
+}
+
+void Game::welcomeScreen() {
+    int in;
+    bool p = false;
+    std::cout << "Welcome to Climb! A card game created my Mark Rizko.\n"
+    << "Press 1 for the rules\tPress 2 to toggle advanced statistics \tPress 3 to play!\n";
+    while (!p){
+        std::cin >> in;
+        switch(in){
+            case 1:
+                displayRules();
+                break;
+            case 2:
+                adStats = !adStats;
+                if (adStats){
+                    std::cout << "Advanced stats on\n";
+                }
+                else{
+                    std::cout << "Advanced stats off\n";
+                }
+                break;
+            case 3:
+                p = true;
+                break;
+            default:
+                std::cout << "Invalid input! Try again\n";
+                break;
+        };
+    }
+    return;
 }
 
 bool Game::finalEncounter() {
@@ -108,6 +185,9 @@ void Game::runGame(){
     while (!gameOver){
         ValidMove = false; // invalid until proven valid
         while(!ValidMove){
+            if (adStats){
+                displayAdStats();
+            }
             displayCards();
             Turn();
         }
