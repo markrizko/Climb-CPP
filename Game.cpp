@@ -1,15 +1,15 @@
 #include "Game.h"
 // TODO keep testing endgame for bugs
 // TODO implement score mechanic (caluclate cards left at the end of run, +5 for king victory)
-// TODO add play again feature after game is over
-// TODO add cards in play to advanced stats
 Game::Game(){
 redDeck = new Deck();
 blackDeck = new Deck();
-
+pa = false;
 redDeck->FillRed();
 blackDeck->FillBlack();
-
+ca = 0;
+blackCount = blackDeck->countDeck() + 32; // adding aces only on black and compensating for king
+redCount = redDeck->countDeck();
 //fill playspace
 Draw();
 adStats = false;
@@ -20,34 +20,52 @@ initFlag = true;
 gameOver = false;
 }
 
+void Game::playAgain() {
+    char input;
+    std::cout << "\n\nDo you want to play again? (y/n) ";
+    std::cin >> input;
+    switch(input){
+        case 'y':
+            pa = true;
+            break;
+        case 'n':
+            pa = false;
+            break;
+        default:
+            std::cout << "Invalid input, please try again.. ";
+            std::cin >> input;
+            break;
+    }
+    return;
+}
+
+// displays advanced statistics such as card advantage and number advantage
 void Game::displayAdStats(){
-    std::string csign = "", nsign = ""; // positive or negative signs, blank at default for equal case
-    int ca, na, i;
+    int i;
     if (redDeck->deckSize() == blackDeck->deckSize()){
         ca = 0;
     }
     else if (redDeck->deckSize() > blackDeck->deckSize()){
-        csign = "+";
         ca = redDeck->deckSize() - blackDeck->deckSize();
     }
     else{
-        csign = "-";
         ca = blackDeck->deckSize() - redDeck->deckSize();
     }
 
-    if (redDeck->countDeck() == blackDeck->countDeck()){
-        na = 0;
-    }
-    else if (redDeck->countDeck() > blackDeck->countDeck()){
-        nsign = "+";
-        na = redDeck->countDeck() - blackDeck->countDeck();
-    }
-    else{
-        nsign = "-";
-        na = blackDeck->countDeck() - redDeck->countDeck();
+    ca--;
+
+    // calculating totals for decks in play
+    for (i = 0; i < 3; ++i){
+        if (redInPlay[i] != NULL){
+            ca++;
+        }
+        if (blackInPlay[i] != NULL){
+            ca--;
+        }
     }
 
-    std::cout << "Card Advantage: " << csign <<  ca << "\tNumber Advantage: " << nsign << na << std::endl;
+    na = redCount - blackCount;
+    std::cout << "Card Advantage: " << ca << "\tNumber Advantage: " << na << std::endl;
     return;
 }
 
@@ -193,6 +211,7 @@ void Game::runGame(){
         }
     }
     endGame();
+    playAgain();
     return;
 }
 
@@ -221,6 +240,11 @@ int Game::Tie(){ // 0 if tie again, 1 if win, 2 if lose
     }
     Card red = redDeck->getCard();
     Card black = blackDeck->getCard();
+    if (!red.isAce()){
+        redCount -= red.getValue();
+    }
+    blackCount -= black.getValue();
+
     /*if (black == NULL){
         return 5;
     }*/
@@ -272,14 +296,19 @@ void Game::Turn(){
 	}
 	if (result == 4 || tres == 4){
 	    for (int x = 0; x < 3; ++x){
+	        blackCount -= blackInPlay[x].getValue();
 	        blackInPlay[x] = NULL;
 	    }
 	}
         // after that, remove cards from redInPlay and blackInPlay
         for (std::list<int>::iterator i = selectedRed.begin(); i != selectedRed.end(); ++i){
+            if (redInPlay[*i].getTag() != 1){
+                redCount -= redInPlay[*i].getValue();
+            }
             redInPlay[*i] = NULL;
         }
         for (std::list<int>::iterator j = selectedBlack.begin(); j != selectedBlack.end(); ++j){
+            blackCount -= blackInPlay[*j].getValue();
             blackInPlay[*j] = NULL;
         }
 	selectedRed.clear();

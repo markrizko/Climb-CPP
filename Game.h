@@ -7,6 +7,7 @@
 class Game
 {
 public:
+    bool pa;
 	Game();
 	// bool init();
 	void runGame();
@@ -27,6 +28,7 @@ public:
 	bool finalEncounter(); // face another king at the end of the game with your remaining cards
 	void welcomeScreen(); // adds welcome screen to the game
 	void displayRules(); // in-game rules
+	void playAgain(); // asks to play again
 
 private:
 	int redTotal();
@@ -45,7 +47,7 @@ private:
 	Card blackInPlay[3];
 	int blackNumIP; // # of black cards in play
 		//Card arrays to hold cards in play
-
+    int ca, blackCount, redCount, na; // card advantage and number advantage
 	bool ValidMove;
 	bool initFlag;
 };
