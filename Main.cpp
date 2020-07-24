@@ -8,6 +8,8 @@ Climb: A 2 Player Card game written by Mark Rizko written in C++.
 
 */
 
+// BETA v1.0 // DEBUG TOOLS STILL ON
+
 #include "Game.h"
 
 

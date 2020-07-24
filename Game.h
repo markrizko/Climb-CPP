@@ -22,13 +22,14 @@ public:
 	int compare(); // compares cards - returns 0 if invalid move - 1 if win - 2 if draw
 	void select();
 	void endGame();
-	int checkWin();
+	void checkWin();
 	void displayCards();
 	bool blackWin(); // checks for invalid moves if deck is 0
 	bool finalEncounter(); // face another king at the end of the game with your remaining cards
 	void welcomeScreen(); // adds welcome screen to the game
 	void displayRules(); // in-game rules
 	void playAgain(); // asks to play again
+	void calculateScore();
 
 private:
 	int redTotal();
@@ -47,7 +48,8 @@ private:
 	Card blackInPlay[3];
 	int blackNumIP; // # of black cards in play
 		//Card arrays to hold cards in play
-    int ca, blackCount, redCount, na; // card advantage and number advantage
+    int ca, blackCount, redCount, na, score; // card advantage, number advantage and score
 	bool ValidMove;
 	bool initFlag;
+	bool fEnc; // boolean for select and display statement that detects when final encounter is being played
 };

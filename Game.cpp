@@ -1,6 +1,7 @@
 #include "Game.h"
 // TODO keep testing endgame for bugs
-// TODO implement score mechanic (caluclate cards left at the end of run, +5 for king victory)
+// TODO balance game OR playtest (on other ppl) low pri
+// TODO tie card not staying on final black
 Game::Game(){
 redDeck = new Deck();
 blackDeck = new Deck();
@@ -8,6 +9,7 @@ pa = false;
 redDeck->FillRed();
 blackDeck->FillBlack();
 ca = 0;
+score = 0;
 blackCount = blackDeck->countDeck() + 32; // adding aces only on black and compensating for king
 redCount = redDeck->countDeck();
 //fill playspace
@@ -18,23 +20,28 @@ blackNumIP = 0;
 ValidMove = false;
 initFlag = true;
 gameOver = false;
+fEnc = false;
 }
 
 void Game::playAgain() {
     char input;
-    std::cout << "\n\nDo you want to play again? (y/n) ";
-    std::cin >> input;
-    switch(input){
-        case 'y':
-            pa = true;
-            break;
-        case 'n':
-            pa = false;
-            break;
-        default:
-            std::cout << "Invalid input, please try again.. ";
-            std::cin >> input;
-            break;
+    bool flag = false;
+    while (!flag){
+        std::cout << "\n\nDo you want to play again? (y/n) ";
+        std::cin >> input;
+        switch(input){
+            case 'y':
+                pa = true;
+                flag = true;
+                break;
+            case 'n':
+                pa = false;
+                flag = true;
+                break;
+            default:
+                std::cout << "Invalid input, please try again.. ";
+                break;
+        }
     }
     return;
 }
@@ -42,17 +49,7 @@ void Game::playAgain() {
 // displays advanced statistics such as card advantage and number advantage
 void Game::displayAdStats(){
     int i;
-    if (redDeck->deckSize() == blackDeck->deckSize()){
-        ca = 0;
-    }
-    else if (redDeck->deckSize() > blackDeck->deckSize()){
-        ca = redDeck->deckSize() - blackDeck->deckSize();
-    }
-    else{
-        ca = blackDeck->deckSize() - redDeck->deckSize();
-    }
-
-    ca--;
+    ca = redDeck->deckSize() - blackDeck->deckSize()-1;
 
     // calculating totals for decks in play
     for (i = 0; i < 3; ++i){
@@ -114,15 +111,23 @@ void Game::welcomeScreen() {
 }
 
 bool Game::finalEncounter() {
+    fEnc = true;
     Card King(13);
     std::cout << "\n\n\t\tTime to face the King\t\t\n\n";
     blackInPlay[1] = King;
     Draw();
     displayCards();
+    if (blackWin()){
+        return false;
+    }
     select();
     if (compare() == 4 || compare() == 6 || compare() == 1){
         if (compare() == 6){
             std::cout << "\nKing Victory\t\t+5 Points\n";
+            score+= 5;
+        }
+        for (std::list<int>::iterator i = selectedRed.begin(); i != selectedRed.end(); ++i){
+            redInPlay[*i] = NULL;
         }
         return true;
     }
@@ -133,6 +138,8 @@ void Game::endGame(){
     if (winner){
         if (finalEncounter()){
             std::cout << "You win!" << std::endl;
+            calculateScore();
+            std::cout << "\nScore: " << score << std::endl;
         }
         else{
             std::cout << "You lose!" << std::endl;
@@ -140,6 +147,19 @@ void Game::endGame(){
     }
     else{
         std::cout << "You lose!" << std::endl;
+    }
+    return;
+}
+
+void Game::calculateScore() {
+    int i;
+    if (redDeck->deckSize() != 0){
+        score += redDeck->countDeck();
+    }
+    for (i = 0; i < 3; ++i){
+        if (redInPlay[i] != NULL && !redInPlay[i].isAce()){
+            score += redInPlay[i].getValue();
+        }
     }
     return;
 }
@@ -180,34 +200,35 @@ bool Game::blackWin(){
 }
 
 
-int Game::checkWin() {
+void Game::checkWin() {
     if (
             (blackInPlay[0] == NULL && blackInPlay[1] == NULL && blackInPlay[2] == NULL)
             && (blackDeck->deckSize() == 0)
             ){
         winner = true;
         gameOver = true;
-        return 0; // red wins
+        return; // red wins
     }
     else if (blackWin()){
         winner = false;
         gameOver = true;
-        return 1; // black wins
+        return; // black wins
     }
     else{
-        return 7; // can be arbitrary, no win yet
+        return; // can be arbitrary, no win yet
     }
 }
 
 void Game::runGame(){
     while (!gameOver){
         ValidMove = false; // invalid until proven valid
-        while(!ValidMove){
+        while(!ValidMove && !gameOver){
             if (adStats){
                 displayAdStats();
             }
             displayCards();
             Turn();
+            Draw();
         }
     }
     endGame();
@@ -313,14 +334,7 @@ void Game::Turn(){
         }
 	selectedRed.clear();
 	selectedBlack.clear();
-	int q = checkWin();
-	if (q == 0 || q == 1){
-	    // if red wins or black wins
-	    return;
-	}
-	else{
-	    Draw();
-	}
+	checkWin();
 	return;
 }
 
@@ -426,42 +440,56 @@ void Game::select(){
         }
     }
     flag = true;
-    std::cout << "Select Black: ";
-    while (flag){
-        std::cin >> input;
-        switch(input){
-            case '1':
-                selectedBlack.push_back(0);
-                blackNumIP++;
-                break;
-            case '2':
-                selectedBlack.push_back(1);
-                blackNumIP++;
-                break;
-            case '3':
-                selectedBlack.push_back(2);
-                blackNumIP++;
-                break;
-            case '.':
-                flag = false;
-                break;
-            case 'x':
-                redDeck->clearDeck();
-                break;
-            default:
-                std::cout << "Invalid\n";
-                break;
+    if (!fEnc){
+        std::cout << "Select Black: ";
+        while (flag){
+            std::cin >> input;
+            switch(input){
+                case '1':
+                    selectedBlack.push_back(0);
+                    blackNumIP++;
+                    break;
+                case '2':
+                    selectedBlack.push_back(1);
+                    blackNumIP++;
+                    break;
+                case '3':
+                    selectedBlack.push_back(2);
+                    blackNumIP++;
+                    break;
+                case '.':
+                    flag = false;
+                    break;
+                case 'x':
+                    redDeck->clearDeck();
+                    break;
+                default:
+                    std::cout << "Invalid\n";
+                    break;
 
+            }
         }
+    }
+    else{
+        selectedBlack.push_back(1);
+        blackNumIP++;
     }
     return;
 }
 void Game::displayCards() {
-    std::cout<< "\t\tK\t\t\tBlack Cards Left: " << blackDeck->deckSize() << std::endl;
-    std::cout << "Black: " << std::endl;
-    std::cout <<"\t" << blackInPlay[0] << "\t" << blackInPlay[1] << "\t" << blackInPlay[2] << std::endl;
-    std::cout << "Red: " << std::endl;
-    std::cout << "\t" << redInPlay[0] << "\t" << redInPlay[1] << "\t" << redInPlay[2] << std::endl;
-    std::cout << "\nRed Cards Left: " << redDeck->deckSize() << std::endl;
+    if (!fEnc){
+        std::cout<< "\t\tK\t\t\tBlack Cards Left: " << blackDeck->deckSize()+1 << std::endl;
+        std::cout << "Black: " << std::endl;
+        std::cout <<"\t" << blackInPlay[0] << "\t" << blackInPlay[1] << "\t" << blackInPlay[2] << std::endl;
+        std::cout << "Red: " << std::endl;
+        std::cout << "\t" << redInPlay[0] << "\t" << redInPlay[1] << "\t" << redInPlay[2] << std::endl;
+        std::cout << "\nRed Cards Left: " << redDeck->deckSize() << std::endl;
+    }
+    else{
+        std::cout << "\t\tK" << std::endl << std::endl;
+        std::cout << "Red:" << std::endl;
+        std::cout << "\t" << redInPlay[0] << "\t" << redInPlay[1] << "\t" << redInPlay[2] << std::endl;
+    }
+
 }
 
