@@ -1,7 +1,6 @@
 #include "Card.h"
 #include <iostream>
 #include <algorithm>
-#include <windows.h>
 /*
 Card::~Card(){
     value = NULL;
@@ -69,7 +68,7 @@ int Deck::countDeck(){
 }
 
 void Deck::FillRed(){
-    int i; 
+    int i;
     for (i = 1; i < 14; ++i){
         Card *in = new Card(i);
         cDeck.push_back(*in);
@@ -127,7 +126,7 @@ int Deck::deckSize(){
 }
 
 bool operator==(const Card& c1, const Card& c2){ //this should work for NULL checks
-    if (c1.cardTag == c2.cardTag){ // just wanted to see if that would change anything since operator is declared as Card::operator== 
+    if (c1.cardTag == c2.cardTag){ // just wanted to see if that would change anything since operator is declared as Card::operator==
         return true;
     }
     return false;
@@ -145,7 +144,7 @@ bool operator!=(const Card& c1, const Card& c2){
 }
 
 Card Card::operator=(const Card& source){
-    if (source == NULL){ 
+    if (source == NULL){
         value = NULL;
         cardTag = NULL;
         return *this;
