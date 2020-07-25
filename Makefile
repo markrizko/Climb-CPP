@@ -9,8 +9,7 @@ OBJ_DIR  := $(BUILD)/objects
 APP_DIR  := $(BUILD)/apps
 TARGET   := climb
 INCLUDE  := -Iinclude/
-SRC      :=                      \
-   $(wildcard src/*.cpp)         \
+SRC      := $(wildcard src/*.cpp)
 
 OBJECTS  := $(SRC:%.cpp=$(OBJ_DIR)/%.o)
 
@@ -35,6 +34,9 @@ debug: all
 
 release: CXXFLAGS += -O2
 release: all
+
+fmt: 
+	-clang-format -i ./**/*.{cpp,h}
 
 clean:
 	-@rm -rvf $(OBJ_DIR)/*
