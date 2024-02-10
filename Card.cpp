@@ -1,7 +1,6 @@
 #include "Card.h"
 #include <iostream>
 #include <algorithm>
-#include <windows.h>
 /*
 Card::~Card(){
     value = NULL;
